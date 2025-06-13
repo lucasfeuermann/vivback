@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Cálculo de Densidade</title>
+</head>
+<body>
+  <h1>Cálculo de Densidade</h1>
+  <form id="formulario">
+    <label>Número de larvas:</label><br>
+    <input type="number" id="larvas" required><br><br>
+
+    <label>Área (m²):</label><br>
+    <input type="number" id="area" required><br><br>
+
+    <button type="submit">Calcular</button>
+  </form>
+
+  <h2 id="resultado"></h2>
+
+  <script>
+    document.getElementById('formulario').addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      const larvas = document.getElementById('larvas').value;
+      const area = document.getElementById('area').value;
+
+      fetch('http://localhost:8080/densidade', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ larvas, area })
+      })
+      .then(res => res.text())
+      .then(resultado => {
+        document.getElementById('resultado').textContent = "Densidade: " + resultado + " larvas/m²";
+      })
+      .catch(() => {
+        document.getElementById('resultado').textContent = "Erro ao conectar com o servidor.";
+      });
+    });
+  </script>
+</body>
+</html>

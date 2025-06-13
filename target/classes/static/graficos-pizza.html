@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Gráfico Pizza - Indicadores do Viveiro</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f1f8e9;
+      padding: 40px;
+      text-align: center;
+    }
+
+    h1 {
+      color: #2e7d32;
+    }
+
+    form {
+      background: white;
+      padding: 20px;
+      max-width: 500px;
+      margin: 0 auto 30px;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    label {
+      display: block;
+      font-weight: bold;
+      margin-top: 15px;
+    }
+
+    input[type="number"] {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+
+    button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      background-color: #43a047;
+      border: none;
+      border-radius: 5px;
+      color: white;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #2e7d32;
+    }
+
+    canvas {
+      max-width: 500px;
+      margin: auto;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Gráfico Pizza - Indicadores do Viveiro</h1>
+
+  <form id="formGrafico">
+    <label for="producaoTotalKg">Produção Total (kg):</label>
+    <input type="number" id="producaoTotalKg" required>
+
+    <label for="areaM2">Área (m²):</label>
+    <input type="number" id="areaM2" required>
+
+    <label for="larvas">Número de Larvas:</label>
+    <input type="number" id="larvas" required>
+
+    <label for="quantidadeFinal">Quantidade Final de Camarões:</label>
+    <input type="number" id="quantidadeFinal" required>
+
+    <button type="submit">Gerar Gráfico Pizza</button>
+  </form>
+
+  <canvas id="graficoPizza"></canvas>
+
+  <script>
+    let chart = null;
+
+    document.getElementById('formGrafico').addEventListener('submit', async function(e) {
+      e.preventDefault();
+
+      const producaoTotalKg = parseFloat(document.getElementById('producaoTotalKg').value);
+      const areaM2 = parseFloat(document.getElementById('areaM2').value);
+      const larvas = parseFloat(document.getElementById('larvas').value);
+      const quantidadeFinal = parseFloat(document.getElementById('quantidadeFinal').value);
+
+      const resposta = await fetch('http://localhost:8080/relatorio', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ producaoTotalKg, areaM2, larvas, quantidadeFinal })
+      });
+
+      const resultado = await resposta.json();
+
+      const dados = [
+        parseFloat(resultado.produtividade),
+        parseFloat(resultado.densidade),
+        parseFloat(resultado.taxaSobrevivencia)
+      ];
+
+      const ctx = document.getElementById('graficoPizza').getContext('2d');
+
+      if (chart) chart.destroy();
+
+      chart = new Chart(ctx, {
+        type: 'pie',
+        data: {
+          labels: ['Produtividade (kg/m²)', 'Densidade (larvas/m²)', 'Sobrevivência (%)'],
+          datasets: [{
+            data: dados,
+            backgroundColor: ['#66bb6a', '#42a5f5', '#ffa726'],
+            borderWidth: 1
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: {
+              position: 'bottom'
+            },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  return `${context.label}: ${context.parsed.toFixed(2)}`;
+                }
+              }
+            }
+          }
+        }
+      });
+    });
+  </script>
+
+</body>
+</html>

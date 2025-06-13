@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Relatório Final</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f1f8e9;
+      padding: 40px;
+    }
+
+    h1 {
+      color: #2e7d32;
+    }
+
+    form, .resultado {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      max-width: 600px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      margin-bottom: 20px;
+    }
+
+    label {
+      font-weight: bold;
+      display: block;
+      margin-top: 15px;
+    }
+
+    input[type="number"] {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+
+    button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      background-color: #43a047;
+      border: none;
+      border-radius: 5px;
+      color: white;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #2e7d32;
+    }
+
+    .section {
+      margin-bottom: 15px;
+    }
+
+    .section strong {
+      color: #1b5e20;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Gerar Relatório Completo</h1>
+
+  <form id="formRelatorio">
+    <label for="producaoTotalKg">Produção Total (kg):</label>
+    <input type="number" id="producaoTotalKg" required>
+
+    <label for="areaM2">Área (m²):</label>
+    <input type="number" id="areaM2" required>
+
+    <label for="larvas">Número de Larvas:</label>
+    <input type="number" id="larvas" required>
+
+    <label for="quantidadeFinal">Quantidade Final de Camarões:</label>
+    <input type="number" id="quantidadeFinal" required>
+
+    <button type="submit">Gerar Relatório</button>
+  </form>
+
+  <div class="resultado" id="relatorio" style="display: none;">
+    <h2>📋 Relatório Gerado</h2>
+
+    <div class="section">
+      <strong>📥 Dados fornecidos:</strong><br>
+      Produção Total: <span id="outProducao"></span> kg<br>
+      Área: <span id="outArea"></span> m²<br>
+      Larvas: <span id="outLarvas"></span><br>
+      Quantidade Final: <span id="outFinal"></span>
+    </div>
+
+    <div class="section">
+      <strong>✅ Resultados:</strong><br>
+      Produtividade: <span id="resProdutividade"></span> kg/m²<br>
+      Densidade: <span id="resDensidade"></span> larvas/m²<br>
+      Taxa de Sobrevivência: <span id="resSobrevivencia"></span> %
+    </div>
+  </div>
+
+  <script>
+    document.getElementById('formRelatorio').addEventListener('submit', async function (e) {
+      e.preventDefault();
+
+      const producaoTotalKg = parseFloat(document.getElementById('producaoTotalKg').value);
+      const areaM2 = parseFloat(document.getElementById('areaM2').value);
+      const larvas = parseFloat(document.getElementById('larvas').value);
+      const quantidadeFinal = parseFloat(document.getElementById('quantidadeFinal').value);
+
+      const resposta = await fetch('http://localhost:8080/relatorio', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ producaoTotalKg, areaM2, larvas, quantidadeFinal })
+      });
+
+      if (resposta.ok) {
+        const resultado = await resposta.json();
+
+        // Mostrar dados fornecidos
+        document.getElementById('outProducao').textContent = producaoTotalKg;
+        document.getElementById('outArea').textContent = areaM2;
+        document.getElementById('outLarvas').textContent = larvas;
+        document.getElementById('outFinal').textContent = quantidadeFinal;
+
+        // Mostrar resultados
+        document.getElementById('resProdutividade').textContent = resultado.produtividade;
+        document.getElementById('resDensidade').textContent = resultado.densidade;
+        document.getElementById('resSobrevivencia').textContent = resultado.taxaSobrevivencia;
+
+        document.getElementById('relatorio').style.display = 'block';
+      } else {
+        alert("Erro ao gerar relatório. Verifique os dados.");
+      }
+    });
+  </script>
+
+</body>
+</html>
