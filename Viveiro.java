@@ -1,0 +1,61 @@
+package com.viveiro.viveiro;
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+
+    @Entity
+public class Viveiro {
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
+
+    private Double area;
+
+    @ManyToOne
+    @JoinColumn(name = "ciclo_id", nullable = false)
+    private Ciclo ciclo;
+
+    @ManyToOne
+    @JoinColumn(name = "usuario_id", nullable = false)
+    private Usuario usuario;
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public Double getArea() {
+        return area;
+    }
+
+    public void setArea(Double area) {
+        this.area = area;
+    }
+
+    public Ciclo getCiclo() {
+        return ciclo;
+    }
+
+    public void setCiclo(Ciclo ciclo) {
+        this.ciclo = ciclo;
+    }
+
+    public Usuario getUsuario() {
+        return usuario;
+    }
+
+    public void setUsuario(Usuario usuario) {
+        this.usuario = usuario;
+    }
+
+    void setUsuario(Ciclo usuario) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+}
+

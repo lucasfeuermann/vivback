@@ -1,0 +1,26 @@
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import java.util.Map;
+
+@RestController
+public class DensidadeController {
+
+    @PostMapping("/densidade")
+    public ResponseEntity<String> calcularDensidade(@RequestBody Map<String, Object> dados) {
+        try {
+            double larvas = Double.parseDouble(dados.get("larvas").toString());
+            double area = Double.parseDouble(dados.get("area").toString());
+
+            if (area == 0) {
+                return ResponseEntity.badRequest().body("0");
+            }
+
+            double densidade = larvas / area;
+            String resultado = String.format("%.2f", densidade);
+            return ResponseEntity.ok(resultado);
+
+        } catch (Exception e) {
+            return ResponseEntity.status(400).body("erro");
+        }
+    }
+}
