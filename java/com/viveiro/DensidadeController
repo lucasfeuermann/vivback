@@ -1,0 +1,36 @@
+package com.viveiro.viveiro;
+
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import java.util.Map;
+
+@CrossOrigin(origins = "*")
+@RestController
+public class DensidadeController {
+
+    @PostMapping("/densidade")
+    public ResponseEntity<String> calcularDensidade(@RequestBody Map<String, Object> dados) {
+        try {
+            if (!dados.containsKey("larvas") || !dados.containsKey("area")) {
+                return ResponseEntity.badRequest().body("Parâmetros 'larvas' e 'area' são obrigatórios");
+            }
+
+            double larvas = Double.parseDouble(dados.get("larvas").toString());
+            double area = Double.parseDouble(dados.get("area").toString());
+
+            if (area == 0) {
+                return ResponseEntity.badRequest().body("Área não pode ser zero");
+            }
+
+            double densidade = larvas / area;
+            String resultado = String.format("%.2f", densidade);
+            return ResponseEntity.ok(resultado);
+
+        } catch (Exception e) {
+            e.printStackTrace();  // ajuda no log para ver erro real
+            return ResponseEntity.status(400).body("Erro: " + e.getMessage());
+        }
+    }
+}
+
